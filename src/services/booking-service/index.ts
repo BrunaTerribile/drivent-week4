@@ -31,6 +31,8 @@ async function postBooking(userId: number, roomId: number) {
     const roomBookings = await bookingRepository.checkRoomBookings(roomId)
     if( roomBookings >= room.capacity) throw forbiddenError();
 
+    const booking = await bookingRepository.postBooking(userId, roomId)
+    return booking;
 }
 
 export default {

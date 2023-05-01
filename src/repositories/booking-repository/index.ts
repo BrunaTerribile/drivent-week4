@@ -22,10 +22,21 @@ async function checkRoomBookings(roomId: number) {
     })
 }
 
+async function postBooking(userId: number, roomId: number) {
+    return prisma.booking.create({
+        data: {
+            userId,
+            roomId
+        },
+        select: { id: true }
+    })
+}
+
 const bookingRepository = {
     getBooking,
     findRoom,
-    checkRoomBookings
+    checkRoomBookings,
+    postBooking
 };
 
 export default bookingRepository;
