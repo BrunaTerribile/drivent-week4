@@ -10,8 +10,22 @@ async function getBooking(userId: number) {
   });
 }
 
+async function findRoom(id: number) {
+    return prisma.room.findFirst({
+        where: { id }
+    });
+}
+
+async function checkRoomBookings(roomId: number) {
+    return prisma.booking.count({
+        where: { roomId }
+    })
+}
+
 const bookingRepository = {
-    getBooking
+    getBooking,
+    findRoom,
+    checkRoomBookings
 };
 
 export default bookingRepository;
