@@ -3,7 +3,7 @@ import supertest from "supertest";
 import { cleanDb, generateValidToken } from "../helpers";
 import httpStatus from "http-status";
 import faker from "@faker-js/faker";
-import { createEnrollmentWithAddress, createTicketType, createUser, createTicket, createHotel, createRoomWithHotelId } from "../factories";
+import { createEnrollmentWithAddress, createTicketType, createUser, createTicket, createHotel, createRoomWithHotelId, createSmallRoom } from "../factories";
 import * as jwt from "jsonwebtoken";
 import { TicketStatus } from "@prisma/client";
 import { createBooking } from "../factories/booking-factory";
@@ -198,7 +198,6 @@ describe('POST /booking', () => {
       expect(response.status).toEqual(httpStatus.FORBIDDEN);
     })
     
-    
     it('should respond with status 201 and with booking data', async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
@@ -284,16 +283,15 @@ describe('PUT /booking/:bookingId', () => {
 
     it('should respond with status 403 if the room has no vacancy', async () => {
       const user = await createUser();
+      const user2 = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
       const ticketType = await createTicketType();
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
       const hotel = await createHotel();
       const room1 =  await createRoomWithHotelId(hotel.id)
-      const room2 = await createRoomWithHotelId(hotel.id)
-      createBooking(1, room2.id)
-      createBooking(1, room2.id)
-      createBooking(1, room2.id)
+      const room2 = await createSmallRoom(hotel.id)
+      await createBooking(user2.id, room2.id)
       const booking = await createBooking(user.id, room1.id)
 
       const response = await server
@@ -312,7 +310,7 @@ describe('PUT /booking/:bookingId', () => {
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
       const hotel = await createHotel();
       const room1 =  await createRoomWithHotelId(hotel.id)
-      const room2 = await createRoomWithHotelId(hotel.id)
+      const room2 = await createSmallRoom(hotel.id)
       const booking = await createBooking(user.id, room1.id)
 
       const response = await server
