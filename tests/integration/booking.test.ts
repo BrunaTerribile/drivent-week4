@@ -198,7 +198,7 @@ describe('POST /booking', () => {
       expect(response.status).toEqual(httpStatus.FORBIDDEN);
     })
     
-    it('should respond with status 201 and with booking data', async () => {
+    it('should respond with status 200 and with booking data', async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
@@ -212,7 +212,7 @@ describe('POST /booking', () => {
         .set('Authorization', `Bearer ${token}`)
         .send({roomId: room.id})
 
-      expect(response.status).toEqual(httpStatus.CREATED);
+      expect(response.status).toEqual(httpStatus.OK);
       expect(response.body).toEqual({
         bookingId: expect.any(Number)
       });
