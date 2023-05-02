@@ -165,15 +165,15 @@ describe('POST /booking', () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketType();
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticketType = await createTicketType(false, true);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       const hotel = await createHotel();
       const room =  await createRoomWithHotelId(hotel.id)
 
       const response = await server
         .post('/booking')
         .set('Authorization', `Bearer ${token}`)
-        .send({roomId: 101})
+        .send({roomId: 0})
 
       expect(response.status).toEqual(httpStatus.NOT_FOUND);
     })
@@ -182,7 +182,7 @@ describe('POST /booking', () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketType();
+      const ticketType = await createTicketType(false, true);
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
       const hotel = await createHotel();
       const room =  await createRoomWithHotelId(hotel.id)
@@ -202,8 +202,8 @@ describe('POST /booking', () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketType();
-      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+      const ticketType = await createTicketType(false, true);
+      const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
       const hotel = await createHotel();
       const room =  await createRoomWithHotelId(hotel.id)
 
@@ -267,7 +267,7 @@ describe('PUT /booking/:bookingId', () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);
-      const ticketType = await createTicketType();
+      const ticketType = await createTicketType(false, true);
       const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
       const hotel = await createHotel();
       const room =  await createRoomWithHotelId(hotel.id)
@@ -276,7 +276,7 @@ describe('PUT /booking/:bookingId', () => {
       const response = await server
         .put(`/booking/${booking.id}`)
         .set('Authorization', `Bearer ${token}`)
-        .send({roomId: 101})
+        .send({roomId: 0})
 
       expect(response.status).toEqual(httpStatus.NOT_FOUND);
     })
