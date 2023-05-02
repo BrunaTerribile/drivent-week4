@@ -19,10 +19,14 @@ export async function postBooking(req: AuthenticatedRequest, res: Response, next
     const { roomId } = req.body;
 
     try {
-        const result = await bookingService.postBooking(Number(userId), Number(roomId))
-        return res.status(httpStatus.OK).send(result)
+        const { id } = await bookingService.postBooking(Number(userId), Number(roomId))
+        return res.status(httpStatus.OK).send({ bookingId: id })
     } catch(error) {
-        next(error)
+        if (error.name === 'NotFoundError') {
+            return res.sendStatus(httpStatus.NOT_FOUND);
+        } else if (error.name === 'forbiddenError') {
+            return res.sendStatus(httpStatus.FORBIDDEN);
+        }
     }
 }
 
@@ -35,6 +39,10 @@ export async function changeBooking(req: AuthenticatedRequest, res: Response, ne
         const result = await bookingService.changeBooking(Number(userId), Number(bookingId), Number(roomId))
         return res.status(httpStatus.OK).send(result)
     } catch(error) {
-        next(error)
+        if (error.name === 'NotFoundError') {
+            return res.sendStatus(httpStatus.NOT_FOUND);
+        } else if (error.name === 'forbiddenError') {
+            return res.sendStatus(httpStatus.FORBIDDEN);
+        }
     }
 }
