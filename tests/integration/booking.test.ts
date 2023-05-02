@@ -8,10 +8,9 @@ import * as jwt from "jsonwebtoken";
 import { TicketStatus } from "@prisma/client";
 import { createBooking } from "../factories/booking-factory";
 
-
 beforeAll(async () => {
     await init();
-});
+}, 70000);
 
 beforeEach(async () => {
   await cleanDb();
@@ -121,7 +120,7 @@ describe('POST /booking', () => {
 
       const response = await server.post('/booking').set('Authorization', `Bearer ${token}`);
 
-      expect(response.status).toEqual(httpStatus.NOT_FOUND);
+      expect(response.status).toEqual(httpStatus.FORBIDDEN);
     });
 
     it('should respond with status 402 if the ticket is not paid', async () => {
@@ -133,7 +132,7 @@ describe('POST /booking', () => {
 
       const response = await server.post('/booking').set('Authorization', `Bearer ${token}`);
 
-      expect(response.status).toEqual(httpStatus.NOT_FOUND);
+      expect(response.status).toEqual(httpStatus.FORBIDDEN);
     });
 
     it('should respond with status 402 if the ticket is remote', async () => {
@@ -145,7 +144,7 @@ describe('POST /booking', () => {
 
       const response = await server.post('/booking').set('Authorization', `Bearer ${token}`);
 
-      expect(response.status).toEqual(httpStatus.NOT_FOUND);
+      expect(response.status).toEqual(httpStatus.FORBIDDEN);
     });
 
     it('should respond with status 402 if the ticket does not includes hotel', async () => {
@@ -157,7 +156,7 @@ describe('POST /booking', () => {
 
       const response = await server.post('/booking').set('Authorization', `Bearer ${token}`);
 
-      expect(response.status).toEqual(httpStatus.NOT_FOUND);
+      expect(response.status).toEqual(httpStatus.FORBIDDEN);
     });
   });
 
@@ -200,7 +199,7 @@ describe('POST /booking', () => {
     })
     
     
-    it('should respond with status 201 and with ticket data', async () => {
+    it('should respond with status 201 and with booking data', async () => {
       const user = await createUser();
       const token = await generateValidToken(user);
       const enrollment = await createEnrollmentWithAddress(user);

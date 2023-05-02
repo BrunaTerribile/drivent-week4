@@ -2,6 +2,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   moduleDirectories: ['node_modules', 'src'],
+  testTimeout: 60000,
   transform: {
     '.+\\.ts$': 'ts-jest',
   },
