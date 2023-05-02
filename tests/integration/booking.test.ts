@@ -1,10 +1,13 @@
 import app, { init } from "@/app";
 import supertest from "supertest";
-import { cleanDb } from "../helpers";
+import { cleanDb, generateValidToken } from "../helpers";
 import httpStatus from "http-status";
 import faker from "@faker-js/faker";
-import { createUser } from "../factories";
+import { createEnrollmentWithAddress, createTicketType, createUser, createTicket, createHotel, createRoomWithHotelId } from "../factories";
 import * as jwt from "jsonwebtoken";
+import { TicketStatus } from "@prisma/client";
+import { createBooking } from "../factories/booking-factory";
+
 
 beforeAll(async () => {
     await init();
@@ -39,4 +42,40 @@ describe('GET /booking', () => {
     
         expect(response.status).toBe(httpStatus.UNAUTHORIZED);
       });
+
+      describe('when token is valid', () => {
+        it('should respond with status 404 when there are no bookings yet', async () => {
+            const token = await generateValidToken();
+      
+            const response = await server.get('/booking').set('Authorization', `Bearer ${token}`);
+      
+            expect(response.status).toBe(httpStatus.NOT_FOUND);
+        });
+
+        it('should respond with status 200 and with user bookings data', async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketType();
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+            const hotel = await createHotel();
+            const room =  await createRoomWithHotelId(hotel.id)
+            const booking = await createBooking(user.id, room.id)
+
+            const response = await server.get('/booking').set('Authorization', `Bearer ${token}`);
+      
+            expect(response.status).toEqual(httpStatus.OK);
+            expect(response.body).toEqual({
+              id: booking.id,
+              Room: {
+                id: room.id,
+                name: room.name,
+                capacity: room.capacity,
+                hotelId: hotel.id,
+                createdAt: room.createdAt.toISOString(),
+                updatedAt: room.updatedAt.toISOString(),
+              }
+            });
+        })
+      })
 })
